@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Пульт</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  :root {
+    --bg: #0a0d0a;
+    --card: #101510;
+    --line: rgba(215, 181, 106, 0.28);
+    --brass: #d7b56a;
+    --brass-deep: #a78445;
+    --moss: #93c48d;
+    --paper: #f3eee4;
+    --mute: #9a9083;
+    --ink: #1a1408;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--paper); }
+  body {
+    font-family: "Segoe UI", system-ui, sans-serif;
+    min-height: 100dvh;
+  }
+  main {
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 22px 18px 36px;
+  }
+  .eyebrow {
+    margin: 0;
+    color: var(--brass);
+    letter-spacing: 0.18em;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+  h1 {
+    margin: 6px 0 0;
+    font-family: Palatino, Georgia, serif;
+    font-weight: 500;
+    font-size: 34px;
+    letter-spacing: -0.03em;
+  }
+  .lead { margin: 8px 0 0; color: var(--mute); line-height: 1.45; font-size: 14px; }
+  .stage {
+    margin: 22px 0 8px;
+    display: flex;
+    justify-content: center;
+  }
+  .device {
+    width: min(100%, 280px);
+    background: #070907;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px 14px 12px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+  .screen {
+    background: #0c100c;
+    border-radius: 8px;
+    aspect-ratio: 4 / 3;
+    padding: 14px 16px;
+    overflow: hidden;
+    position: relative;
+  }
+  .screen.portrait { aspect-ratio: 3 / 4; }
+  .screen .kicker {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--moss);
+  }
+  .screen p {
+    margin: 10px 0 0;
+    font-family: Palatino, Georgia, serif;
+    font-size: 15px;
+    line-height: 1.35;
+    color: var(--moss);
+    white-space: pre-wrap;
+  }
+  .screen.amber p, .screen.amber .kicker { color: var(--brass); }
+  .screen.slate p, .screen.slate .kicker { color: #c5c6c0; }
+  .screen .page {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    font-size: 11px;
+    color: var(--mute);
+  }
+  label {
+    display: block;
+    margin: 18px 0 8px;
+    color: var(--brass);
+    font-size: 13px;
+  }
+  textarea, input[type="text"], input[type="password"] {
+    width: 100%;
+    background: var(--card);
+    color: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 16px;
+  }
+  textarea { min-height: 112px; resize: vertical; }
+  .row { display: flex; gap: 8px; }
+  .choice, .ghost, .send {
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 10px;
+    font: inherit;
+    font-size: 14px;
+  }
+  .choice, .ghost {
+    flex: 1;
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid var(--line);
+  }
+  .choice.on {
+    background: var(--brass);
+    color: var(--ink);
+    border-color: var(--brass);
+  }
+  input[type="range"] {
+    width: 100%;
+    accent-color: var(--brass);
+  }
+  .scale { display: flex; justify-content: space-between; color: var(--mute); font-size: 12px; }
+  .send {
+    width: 100%;
+    margin-top: 22px;
+    background: var(--brass);
+    color: var(--ink);
+    font-weight: 700;
+    padding: 15px;
+  }
+  .ghost { margin-top: 8px; width: 100%; }
+  .note { margin: 14px 0 0; color: var(--mute); font-size: 12px; line-height: 1.45; }
+  .hint {
+    display: none;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #16120c;
+    color: var(--brass);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Карманный экран</p>
+  <h1>Пульт</h1>
+  <p class="lead">Текст и вид экрана уходят на плату через Telegram. Компьютер для этого не нужен.</p>
+  <div class="stage">
+    <div class="device">
+      <div id="screen" class="screen">
+        <div class="kicker">Чтение</div>
+        <p id="preview">Здесь появится ваш текст.</p>
+        <div class="page">01</div>
+      </div>
+    </div>
+  </div>
+  <label for="text">Текст на экран</label>
+  <textarea id="text" maxlength="3500" placeholder="Абзац, список или короткая заметка"></textarea>
+  <label>Положение</label>
+  <div class="row">
+    <button type="button" class="choice on" data-orient="h">Горизонтально</button>
+    <button type="button" class="choice" data-orient="v">Вертикально</button>
+  </div>
+  <label>Цвет текста</label>
+  <div class="row">
+    <button type="button" class="choice on" data-theme="green">Зелёный</button>
+    <button type="button" class="choice" data-theme="amber">Янтарь</button>
+    <button type="button" class="choice" data-theme="slate">Серый</button>
+  </div>
+  <label for="light">Яркость</label>
+  <input id="light" type="range" min="8" max="180" value="48">
+  <div class="scale"><span>Ночь</span><span>День</span></div>
+  <label for="key">Ключ Gemini, если хотите пересказ</label>
+  <input id="key" type="password" maxlength="110" placeholder="Необязательно, с aistudio.google.com" autocomplete="off">
+  <button class="send" id="apply" type="button">Показать на экране</button>
+  <button class="ghost" id="clear" type="button">Очистить экран</button>
+  <p class="note">Бесплатный Gemini включает лимиты Google. Без ключа на экране будет ваш текст как есть. Фото плата с телефона не разбирает: пришлите слова.</p>
+  <div class="hint" id="hint"></div>
+</main>
+<script>
+const tg = window.Telegram && window.Telegram.WebApp;
+const state = { orient: "h", theme: "green" };
+const screen = document.getElementById("screen");
+const preview = document.getElementById("preview");
+const text = document.getElementById("text");
+const hint = document.getElementById("hint");
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+  if (tg.setHeaderColor) tg.setHeaderColor("#0a0d0a");
+  if (tg.setBackgroundColor) tg.setBackgroundColor("#0a0d0a");
+  if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+  const button = tg.MainButton;
+  button.setText("Показать на экране");
+  button.color = "#d7b56a";
+  button.textColor = "#1a1408";
+  button.show();
+  button.onClick(() => submit(false));
+}
+
+function paint() {
+  screen.className = "screen " + (state.orient === "v" ? "portrait " : "") + state.theme;
+  const value = text.value.trim();
+  preview.textContent = value || "Здесь появится ваш текст.";
+}
+
+text.addEventListener("input", paint);
+
+document.querySelectorAll("[data-orient]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.orient = button.dataset.orient;
+    document.querySelectorAll("[data-orient]").forEach((item) => item.classList.toggle("on", item === button));
+    paint();
+  });
+});
+
+document.querySelectorAll("[data-theme]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.theme = button.dataset.theme;
+    document.querySelectorAll("[data-theme]").forEach((item) => item.classList.toggle("on", item === button));
+    paint();
+  });
+});
+
+function payload(clear) {
+  return JSON.stringify({
+    text: clear ? "" : text.value.trim(),
+    orient: state.orient,
+    theme: state.theme,
+    light: Number(document.getElementById("light").value),
+    key: document.getElementById("key").value.trim(),
+    clear: clear
+  });
+}
+
+function submit(clear) {
+  const body = payload(clear);
+  if (tg && typeof tg.sendData === "function") {
+    if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
+    tg.sendData(body);
+    return;
+  }
+  hint.style.display = "block";
+  hint.textContent = "Откройте этот пульт кнопкой «Пульт» внизу чата с ботом. Из меню Telegram данные на плату не отправляются.";
+}
+
+document.getElementById("apply").addEventListener("click", () => submit(false));
+document.getElementById("clear").addEventListener("click", () => submit(true));
+paint();
+</script>
+</body>
+</html>
