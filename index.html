@@ -8,10 +8,9 @@
 <style>
   :root {
     --bg: #0a0d0a;
-    --card: #101510;
+    --card: #121712;
     --line: rgba(215, 181, 106, 0.28);
     --brass: #d7b56a;
-    --brass-deep: #a78445;
     --moss: #93c48d;
     --paper: #f3eee4;
     --mute: #9a9083;
@@ -19,82 +18,43 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--paper); }
-  body {
-    font-family: "Segoe UI", system-ui, sans-serif;
-    min-height: 100dvh;
-  }
-  main {
-    max-width: 440px;
+  body { font-family: "Segoe UI", system-ui, sans-serif; }
+  #app {
+    max-width: 480px;
     margin: 0 auto;
-    padding: 22px 18px 36px;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
+  header { padding: 18px 18px 8px; }
   .eyebrow {
     margin: 0;
     color: var(--brass);
-    letter-spacing: 0.18em;
+    letter-spacing: 0.16em;
     font-size: 11px;
     text-transform: uppercase;
   }
   h1 {
-    margin: 6px 0 0;
+    margin: 4px 0 0;
     font-family: Palatino, Georgia, serif;
     font-weight: 500;
-    font-size: 34px;
-    letter-spacing: -0.03em;
+    font-size: 32px;
   }
-  .lead { margin: 8px 0 0; color: var(--mute); line-height: 1.45; font-size: 14px; }
-  .stage {
-    margin: 22px 0 8px;
-    display: flex;
-    justify-content: center;
-  }
-  .device {
-    width: min(100%, 280px);
-    background: #070907;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    padding: 14px 14px 12px;
-    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-  }
-  .screen {
-    background: #0c100c;
-    border-radius: 8px;
-    aspect-ratio: 4 / 3;
-    padding: 14px 16px;
-    overflow: hidden;
-    position: relative;
-  }
-  .screen.portrait { aspect-ratio: 3 / 4; }
-  .screen .kicker {
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--moss);
-  }
-  .screen p {
-    margin: 10px 0 0;
-    font-family: Palatino, Georgia, serif;
+  main { flex: 1; padding: 8px 18px 96px; }
+  .view { display: none; }
+  .view.on { display: block; }
+  .thread { display: flex; flex-direction: column; gap: 10px; min-height: 220px; }
+  .bubble {
+    max-width: 88%;
+    padding: 12px 14px;
+    border-radius: 16px;
+    line-height: 1.4;
     font-size: 15px;
-    line-height: 1.35;
-    color: var(--moss);
-    white-space: pre-wrap;
   }
-  .screen.amber p, .screen.amber .kicker { color: var(--brass); }
-  .screen.slate p, .screen.slate .kicker { color: #c5c6c0; }
-  .screen .page {
-    position: absolute;
-    right: 10px;
-    bottom: 8px;
-    font-size: 11px;
-    color: var(--mute);
-  }
-  label {
-    display: block;
-    margin: 18px 0 8px;
-    color: var(--brass);
-    font-size: 13px;
-  }
-  textarea, input[type="text"], input[type="password"] {
+  .bubble.bot { background: #161b16; color: var(--paper); border-bottom-left-radius: 6px; }
+  .bubble.me { align-self: flex-end; background: var(--brass); color: var(--ink); border-bottom-right-radius: 6px; }
+  label { display: block; margin: 16px 0 8px; color: var(--brass); font-size: 13px; }
+  textarea, input[type="password"] {
     width: 100%;
     background: var(--card);
     color: var(--paper);
@@ -104,9 +64,9 @@
     font: inherit;
     font-size: 16px;
   }
-  textarea { min-height: 112px; resize: vertical; }
+  textarea { min-height: 88px; resize: vertical; }
   .row { display: flex; gap: 8px; }
-  .choice, .ghost, .send {
+  .choice, .send, .ghost {
     border: 0;
     border-radius: 14px;
     padding: 12px 10px;
@@ -119,27 +79,65 @@
     color: var(--paper);
     border: 1px solid var(--line);
   }
-  .choice.on {
-    background: var(--brass);
-    color: var(--ink);
-    border-color: var(--brass);
-  }
-  input[type="range"] {
-    width: 100%;
-    margin-top: 12px;
-    accent-color: var(--brass);
-  }
-  .scale { display: flex; justify-content: space-between; color: var(--mute); font-size: 12px; }
+  .choice.on { background: var(--brass); color: var(--ink); border-color: var(--brass); }
   .send {
     width: 100%;
-    margin-top: 22px;
+    margin-top: 12px;
     background: var(--brass);
     color: var(--ink);
     font-weight: 700;
-    padding: 15px;
+    padding: 14px;
   }
   .ghost { margin-top: 8px; width: 100%; }
-  .note { margin: 14px 0 0; color: var(--mute); font-size: 12px; line-height: 1.45; }
+  input[type="range"] { width: 100%; margin-top: 12px; accent-color: var(--brass); }
+  .scale { display: flex; justify-content: space-between; color: var(--mute); font-size: 12px; }
+  .note { color: var(--mute); font-size: 13px; line-height: 1.45; }
+  .stage { display: flex; justify-content: center; margin: 8px 0 4px; }
+  .device {
+    width: min(100%, 280px);
+    background: #070907;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px;
+  }
+  .screen {
+    background: #0c100c;
+    border-radius: 8px;
+    aspect-ratio: 4 / 3;
+    padding: 14px 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .screen.portrait { aspect-ratio: 3 / 4; }
+  .screen .kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--moss); }
+  .screen p {
+    margin: 10px 0 0;
+    font-family: Palatino, Georgia, serif;
+    color: var(--moss);
+    line-height: 1.35;
+    white-space: pre-wrap;
+  }
+  .screen.amber p, .screen.amber .kicker { color: var(--brass); }
+  .screen.slate p, .screen.slate .kicker { color: #c5c6c0; }
+  nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    gap: 8px;
+    padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(10, 13, 10, 0.94);
+    border-top: 1px solid var(--line);
+  }
+  nav button {
+    flex: 1;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px;
+    background: transparent;
+    color: var(--mute);
+    font: inherit;
+  }
+  nav button.on { background: #1a160f; color: var(--brass); }
   .hint {
     display: none;
     margin-top: 12px;
@@ -153,78 +151,107 @@
 </style>
 </head>
 <body>
-<main>
-  <p class="eyebrow">Карманный экран</p>
-  <h1>Пульт</h1>
-  <p class="lead">Текст и вид экрана уходят на плату через Telegram. Компьютер для этого не нужен.</p>
-  <div class="stage">
-    <div class="device">
-      <div id="screen" class="screen">
-        <div class="kicker">Чтение</div>
-        <p id="preview">Здесь появится ваш текст.</p>
-        <div class="page">01</div>
+<div id="app">
+  <header>
+    <p class="eyebrow">Терминал</p>
+    <h1 id="title">Чат</h1>
+  </header>
+  <main>
+    <section id="chat" class="view on">
+      <div class="thread" id="thread">
+        <div class="bubble bot">Напишите вопрос как в обычном чате. Ответ придёт сообщением от бота, короткая версия — на экран платы.</div>
       </div>
-    </div>
-  </div>
-  <label for="text">Текст на экран</label>
-  <textarea id="text" maxlength="3500" placeholder="Абзац, список или короткая заметка"></textarea>
-  <p class="eyebrow" style="margin-top:22px">Устройство</p>
-  <label>Положение</label>
-  <div class="row">
-    <button type="button" class="choice on" data-orient="h">Горизонтально</button>
-    <button type="button" class="choice" data-orient="v">Вертикально</button>
-  </div>
-  <label>Цвет текста</label>
-  <div class="row">
-    <button type="button" class="choice on" data-theme="green">Зелёный</button>
-    <button type="button" class="choice" data-theme="amber">Янтарь</button>
-    <button type="button" class="choice" data-theme="slate">Серый</button>
-  </div>
-  <label for="light">Яркость <span id="lightValue">максимум</span></label>
-  <div class="row">
-    <button type="button" class="choice" data-light="32">Тускло</button>
-    <button type="button" class="choice" data-light="140">Средне</button>
-    <button type="button" class="choice on" data-light="255">Максимум</button>
-  </div>
-  <input id="light" type="range" min="8" max="255" value="255">
-  <div class="scale"><span>Ночь</span><span>На полную</span></div>
-  <label for="key">Ключ Gemini, если хотите пересказ</label>
-  <input id="key" type="password" maxlength="110" placeholder="Необязательно, с aistudio.google.com" autocomplete="off">
-  <button class="send" id="apply" type="button">Показать на экране</button>
-  <button class="ghost" id="clear" type="button">Очистить экран</button>
-  <p class="note">Бесплатный Gemini включает лимиты Google. Без ключа на экране будет ваш текст как есть. Фото плата с телефона не разбирает: пришлите слова.</p>
-  <div class="hint" id="hint"></div>
-</main>
+      <label for="ask">Вопрос</label>
+      <textarea id="ask" maxlength="2000" placeholder="Спросите что угодно"></textarea>
+      <label for="key">Ключ Gemini, один раз</label>
+      <input id="key" type="password" maxlength="110" placeholder="Бесплатный, с aistudio.google.com" autocomplete="off">
+      <button class="send" id="askSend" type="button">Спросить</button>
+      <p class="note">Без ключа бот только кладёт текст на экран. С ключом отвечает в чате. У бесплатного Gemini есть лимиты Google.</p>
+    </section>
+    <section id="device" class="view">
+      <div class="stage">
+        <div class="device">
+          <div id="screen" class="screen">
+            <div class="kicker">Чтение</div>
+            <p id="preview">Здесь появится текст.</p>
+          </div>
+        </div>
+      </div>
+      <label for="screenText">Текст на экран</label>
+      <textarea id="screenText" maxlength="3500" placeholder="Заметка, которую нужно просто показать"></textarea>
+      <label>Положение</label>
+      <div class="row">
+        <button type="button" class="choice on" data-orient="h">Горизонтально</button>
+        <button type="button" class="choice" data-orient="v">Вертикально</button>
+      </div>
+      <label>Цвет</label>
+      <div class="row">
+        <button type="button" class="choice on" data-theme="green">Зелёный</button>
+        <button type="button" class="choice" data-theme="amber">Янтарь</button>
+        <button type="button" class="choice" data-theme="slate">Серый</button>
+      </div>
+      <label for="light">Яркость <span id="lightValue">максимум</span></label>
+      <div class="row">
+        <button type="button" class="choice" data-light="32">Тускло</button>
+        <button type="button" class="choice" data-light="140">Средне</button>
+        <button type="button" class="choice on" data-light="255">Максимум</button>
+      </div>
+      <input id="light" type="range" min="8" max="255" value="255">
+      <div class="scale"><span>Ночь</span><span>На полную</span></div>
+      <button class="send" id="apply" type="button">Показать на экране</button>
+      <button class="ghost" id="clear" type="button">Очистить экран</button>
+    </section>
+    <div class="hint" id="hint"></div>
+  </main>
+  <nav>
+    <button type="button" class="on" data-tab="chat">Чат</button>
+    <button type="button" data-tab="device">Экран</button>
+  </nav>
+</div>
 <script>
 const tg = window.Telegram && window.Telegram.WebApp;
-const state = { orient: "h", theme: "green" };
-const screen = document.getElementById("screen");
-const preview = document.getElementById("preview");
-const text = document.getElementById("text");
+const state = { orient: "h", theme: "green", tab: "chat" };
 const hint = document.getElementById("hint");
-
 if (tg) {
   tg.ready();
   tg.expand();
   if (tg.setHeaderColor) tg.setHeaderColor("#0a0d0a");
   if (tg.setBackgroundColor) tg.setBackgroundColor("#0a0d0a");
   if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
-  const button = tg.MainButton;
-  button.setText("Показать на экране");
-  button.color = "#d7b56a";
-  button.textColor = "#1a1408";
-  button.show();
-  button.onClick(() => submit(false));
 }
 
+document.querySelectorAll("[data-tab]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.tab = button.dataset.tab;
+    document.querySelectorAll("[data-tab]").forEach((item) => item.classList.toggle("on", item === button));
+    document.getElementById("chat").classList.toggle("on", state.tab === "chat");
+    document.getElementById("device").classList.toggle("on", state.tab === "device");
+    document.getElementById("title").textContent = state.tab === "chat" ? "Чат" : "Экран";
+  });
+});
+
+const screen = document.getElementById("screen");
+const preview = document.getElementById("preview");
+const screenText = document.getElementById("screenText");
 function paint() {
-  screen.className = "screen " + (state.orient === "v" ? "portrait " : "") + state.theme;
-  const value = text.value.trim();
-  preview.textContent = value || "Здесь появится ваш текст.";
+  screen.className = "screen" + (state.orient === "v" ? " portrait" : "") + " " + state.theme;
+  preview.textContent = screenText.value.trim() || "Здесь появится текст.";
 }
-
-text.addEventListener("input", paint);
-
+screenText.addEventListener("input", paint);
+document.querySelectorAll("[data-orient]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.orient = button.dataset.orient;
+    document.querySelectorAll("[data-orient]").forEach((item) => item.classList.toggle("on", item === button));
+    paint();
+  });
+});
+document.querySelectorAll("[data-theme]").forEach((button) => {
+  button.addEventListener("click", () => {
+    state.theme = button.dataset.theme;
+    document.querySelectorAll("[data-theme]").forEach((item) => item.classList.toggle("on", item === button));
+    paint();
+  });
+});
 const light = document.getElementById("light");
 const lightValue = document.getElementById("lightValue");
 function lightName(value) {
@@ -246,46 +273,44 @@ document.querySelectorAll("[data-light]").forEach((button) => {
 });
 light.addEventListener("input", () => syncLight(light.value));
 
-document.querySelectorAll("[data-orient]").forEach((button) => {
-  button.addEventListener("click", () => {
-    state.orient = button.dataset.orient;
-    document.querySelectorAll("[data-orient]").forEach((item) => item.classList.toggle("on", item === button));
-    paint();
-  });
-});
-
-document.querySelectorAll("[data-theme]").forEach((button) => {
-  button.addEventListener("click", () => {
-    state.theme = button.dataset.theme;
-    document.querySelectorAll("[data-theme]").forEach((item) => item.classList.toggle("on", item === button));
-    paint();
-  });
-});
-
-function payload(clear) {
-  return JSON.stringify({
-    text: clear ? "" : text.value.trim(),
-    orient: state.orient,
-    theme: state.theme,
-    light: Number(document.getElementById("light").value),
-    key: document.getElementById("key").value.trim(),
-    clear: clear
-  });
-}
-
-function submit(clear) {
-  const body = payload(clear);
+function send(body) {
   if (tg && typeof tg.sendData === "function") {
     if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred("medium");
-    tg.sendData(body);
+    tg.sendData(JSON.stringify(body));
     return;
   }
   hint.style.display = "block";
-  hint.textContent = "Откройте этот пульт кнопкой «Пульт» внизу чата с ботом. Из меню Telegram данные на плату не отправляются.";
+  hint.textContent = "Откройте пульт кнопкой «Пульт» внизу чата. Из меню Telegram сообщение на плату не уходит.";
 }
 
-document.getElementById("apply").addEventListener("click", () => submit(false));
-document.getElementById("clear").addEventListener("click", () => submit(true));
+document.getElementById("askSend").addEventListener("click", () => {
+  const text = document.getElementById("ask").value.trim();
+  if (!text) return;
+  const thread = document.getElementById("thread");
+  const mine = document.createElement("div");
+  mine.className = "bubble me";
+  mine.textContent = text;
+  thread.appendChild(mine);
+  send({
+    mode: "chat",
+    text: text,
+    key: document.getElementById("key").value.trim()
+  });
+});
+
+document.getElementById("apply").addEventListener("click", () => {
+  send({
+    mode: "screen",
+    text: screenText.value.trim(),
+    orient: state.orient,
+    theme: state.theme,
+    light: Number(light.value),
+    clear: false
+  });
+});
+document.getElementById("clear").addEventListener("click", () => {
+  send({ mode: "screen", text: "", orient: state.orient, theme: state.theme, light: Number(light.value), clear: true });
+});
 paint();
 </script>
 </body>
