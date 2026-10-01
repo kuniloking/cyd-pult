@@ -126,6 +126,7 @@
   }
   input[type="range"] {
     width: 100%;
+    margin-top: 12px;
     accent-color: var(--brass);
   }
   .scale { display: flex; justify-content: space-between; color: var(--mute); font-size: 12px; }
@@ -167,6 +168,7 @@
   </div>
   <label for="text">Текст на экран</label>
   <textarea id="text" maxlength="3500" placeholder="Абзац, список или короткая заметка"></textarea>
+  <p class="eyebrow" style="margin-top:22px">Устройство</p>
   <label>Положение</label>
   <div class="row">
     <button type="button" class="choice on" data-orient="h">Горизонтально</button>
@@ -178,9 +180,14 @@
     <button type="button" class="choice" data-theme="amber">Янтарь</button>
     <button type="button" class="choice" data-theme="slate">Серый</button>
   </div>
-  <label for="light">Яркость</label>
-  <input id="light" type="range" min="8" max="180" value="48">
-  <div class="scale"><span>Ночь</span><span>День</span></div>
+  <label for="light">Яркость <span id="lightValue">максимум</span></label>
+  <div class="row">
+    <button type="button" class="choice" data-light="32">Тускло</button>
+    <button type="button" class="choice" data-light="140">Средне</button>
+    <button type="button" class="choice on" data-light="255">Максимум</button>
+  </div>
+  <input id="light" type="range" min="8" max="255" value="255">
+  <div class="scale"><span>Ночь</span><span>На полную</span></div>
   <label for="key">Ключ Gemini, если хотите пересказ</label>
   <input id="key" type="password" maxlength="110" placeholder="Необязательно, с aistudio.google.com" autocomplete="off">
   <button class="send" id="apply" type="button">Показать на экране</button>
@@ -217,6 +224,27 @@ function paint() {
 }
 
 text.addEventListener("input", paint);
+
+const light = document.getElementById("light");
+const lightValue = document.getElementById("lightValue");
+function lightName(value) {
+  const level = Number(value);
+  if (level >= 250) return "максимум";
+  if (level >= 120) return "средне";
+  if (level <= 40) return "тускло";
+  return String(level);
+}
+function syncLight(value) {
+  light.value = value;
+  lightValue.textContent = lightName(value);
+  document.querySelectorAll("[data-light]").forEach((item) => {
+    item.classList.toggle("on", Number(item.dataset.light) === Number(value));
+  });
+}
+document.querySelectorAll("[data-light]").forEach((button) => {
+  button.addEventListener("click", () => syncLight(button.dataset.light));
+});
+light.addEventListener("input", () => syncLight(light.value));
 
 document.querySelectorAll("[data-orient]").forEach((button) => {
   button.addEventListener("click", () => {
